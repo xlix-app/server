@@ -1,5 +1,5 @@
-DEFINE NAMESPACE main;
-USE NS main;
+DEFINE NAMESPACE xlix;
+USE NS xlix;
 DEFINE DATABASE main;
 USE DB main;
 

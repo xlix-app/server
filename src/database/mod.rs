@@ -15,7 +15,7 @@ use crate::config::{Cfg, ConfigPer};
 type SurrealClient = Surreal<Db>;
 
 #[cfg(not(test))]
-const DB_PATH: &str = "rhs.db";
+const DB_PATH: &str = "xlix.db";
 
 #[cfg(not(test))]
 static DB_INST: OnceCell<Database> = OnceCell::const_new();
@@ -47,7 +47,7 @@ impl Database {
         db.build().await?;
 
         // if changed update build.surql!
-        db.client.use_ns("main").use_db("main").await?;
+        db.client.use_ns("xlix").use_db("main").await?;
 
         #[cfg(not(test))]
         db.spawn_update_task().await?;
