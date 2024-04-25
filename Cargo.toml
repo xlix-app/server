@@ -1,0 +1,35 @@
+[package]
+name = "xlix"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+# --- Main features
+default = []
+cloudflare = ["tls"]
+# --- Dependencies
+tls = [
+    "tokio-rustls",
+    "rustls",
+    "rustls-pemfile",
+]
+
+[dependencies]
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tokio = { version = "1", features = ["full"] }
+hyper = { version = "1", features = ["full"] }
+http-body-util = "0.1"
+hyper-util = { version = "0.1", features = ["full"] }
+surrealdb = { version = "=1.4.2", features = ["kv-rocksdb", "kv-mem"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow = "1.0"
+paste = "1.0"
+tokio-rustls = { version = "0.26", optional = true }
+rustls = { version = "0.23", optional = true }
+rustls-pemfile = { version = "2.0.0", optional = true }
+lazy_static = "1.4.0"
+
+[target.'cfg(windows)'.dependencies]
+ansi_term = "0.12.1"

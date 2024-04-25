@@ -1,0 +1,16 @@
+# IDE settings
+/.idea
+
+# Build files
+/target
+Cargo.lock
+
+# Config
+/config
+
+# Dynamic files
+/*.db
+
+# Secret files
+/secrets/*
+!/secrets/README.md

@@ -1,0 +1,55 @@
+use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+use tokio::sync::OnceCell;
+use super::*;
+
+static CFG: OnceCell<ConfigPer> = OnceCell::const_new();
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ConfigPer {
+    pub addr_server: SocketAddr,
+    pub db_update_interval: u64,
+}
+
+impl Default for ConfigPer {
+    fn default() -> Self {
+        Self {
+            addr_server: SocketAddr::new(
+                IpAddr::V4(Ipv4Addr::LOCALHOST),
+                80,
+            ),
+            db_update_interval: 10,
+        }
+    }
+}
+
+impl CfgIntern for ConfigPer {
+    fn path() -> &'static str {
+        "config/persistent.json"
+    }
+
+    fn fix(&mut self) {
+        if self.db_update_interval < 5 {
+            warn!("Config value 'db_update_interval' under the minimum value, updating to: '5'.");
+            self.db_update_interval = 5;
+        }
+    }
+}
+
+impl Cfg for ConfigPer {
+    type Config = &'static ConfigPer;
+    type Error = ();
+
+    async fn init() -> anyhow::Result<()> {
+        let initialization = async move {
+            ConfigPer::load().await.map_err(anyhow::Error::from)
+        };
+
+        CFG.get_or_try_init(|| initialization)
+            .await
+            .map(|_| ())
+    }
+
+    async fn get() -> Result<Self::Config, Self::Error> {
+        CFG.get().ok_or_else(|| ())
+    }
+}
