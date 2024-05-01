@@ -5,7 +5,7 @@ use crate::config::{Cfg, ConfigDyn, ConfigPer};
 use crate::database::Database;
 use crate::handler;
 use crate::utils::consts::VERSION;
-use crate::utils::logs;
+use crate::utils::{console, logs};
 
 #[cfg(feature = "tls")]
 use crate::tls::*;
@@ -17,6 +17,7 @@ async fn warmup() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     ConfigPer::init().await?;
     ConfigDyn::init().await?;
     Database::get().await?;
+    console::Engine::init().await;
 
     Ok(())
 }
