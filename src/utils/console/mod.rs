@@ -1,12 +1,15 @@
+mod cmd_system;
+
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicBool, Ordering};
 use command_engine::*;
 use tokio::io::{AsyncBufReadExt, BufReader, stdin};
 use tokio::sync::OnceCell;
+use crate::utils::AnyString;
 
 static COMMAND_ENGINE: OnceCell<Engine> = OnceCell::const_new();
 
-pub type Output = Result<(), ()>;
+pub type Output = Result<AnyString, AnyString>;
 
 pub struct Engine {
     console_reader_running: AtomicBool,
@@ -36,12 +39,16 @@ impl Engine {
     }
 
     async fn new() -> Self {
-        let mut map = HashMap::new();
-
         Self {
             console_reader_running: AtomicBool::new(false),
-            commands: map,
+            commands: HashMap::new(),
         }
+        .add_command(cmd_system::System)
+    }
+
+    fn add_command<C: Command<Output=Output>>(mut self, command: C) -> Self {
+        self.commands.insert(command.caller(), Box::new(command));
+        self
     }
 
     async fn run_console_reader(engine: &'static Engine) {
