@@ -1,0 +1,1 @@
+CREATE ONLY system SET name=$name, publicKey=$public_key;

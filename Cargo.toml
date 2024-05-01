@@ -31,6 +31,7 @@ rustls = { version = "0.23", optional = true }
 rustls-pemfile = { version = "2.0.0", optional = true }
 lazy_static = "1.4.0"
 command-engine = { version = "1.0.0", default-features = false, features = ["async"] }
+sessionless = "0.1.1"
 
 [target.'cfg(windows)'.dependencies]
 ansi_term = "0.12.1"

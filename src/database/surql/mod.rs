@@ -13,4 +13,5 @@ macro_rules! surql {
 surql! {
     build,
     update,
+    system_create,
 }
