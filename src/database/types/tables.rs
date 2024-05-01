@@ -95,14 +95,10 @@ macro_rules! table {
     };
 }
 
-/* ===== [ EXAMPLE ] =====
-    table! {
-        name: user,
-        fields: {
-            name: String,
-            email: String,
-            birth: Option<u64>,
-            picture: Option<String>,
-        }
+table! {
+    name: system,
+    fields: {
+        name: String,
+        public_key: Option<String>,
     }
-*/
+}
