@@ -102,3 +102,11 @@ table! {
         public_key: Option<String>,
     }
 }
+
+table! {
+    name: file,
+    fields: {
+        size: usize,
+        pack: Vec<()>,
+    }
+}
