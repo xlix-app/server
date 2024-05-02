@@ -59,6 +59,7 @@ pub(super) async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync
                     .serve_connection(io, service_fn(|req| async move {
                         handler::service(req, addr).await
                     }))
+                    .with_upgrades()
                     .await
                 {
                     error!("Error serving connection: {:?}", err);
@@ -90,6 +91,7 @@ pub(super) async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync
                     .serve_connection(TokioIo::new(tls_stream), service_fn(|req| async move {
                         handler::service(req, addr).await
                     }))
+                    .with_upgrades()
                     .await
                 {
                     error!("Error serving connection: {:#?}", err);

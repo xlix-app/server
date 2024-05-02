@@ -44,6 +44,18 @@ pub enum RHSError {
     #[serde(rename="error.httpActionNotAccepted")]
     ActionNotAccepted,
 
+    // --- WEB SOCKET
+    #[serde(rename="error.wsMissingSecWebSocketKey")]
+    MissingSecWebSocketKey,
+    #[serde(rename="error.wsMissingSecWebSocketVersionHeader")]
+    MissingSecWebSocketVersionHeader,
+    #[serde(rename="error.wsDisallowedWebSocketVersion")]
+    DisallowedWebSocketVersion {
+        supported_version: AnyString,
+    },
+    #[serde(rename="error.wsHandshakeIncomplete")]
+    HandshakeIncomplete,
+
     // --- CLIENT
     #[serde(rename = "error.clientArgumentInvalid")]
     ArgumentInvalid {

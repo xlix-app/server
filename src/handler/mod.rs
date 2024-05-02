@@ -1,5 +1,6 @@
 pub mod api;
 mod resources;
+mod ws;
 
 use std::convert::Infallible;
 use std::net::SocketAddr;
@@ -8,6 +9,7 @@ use hyper::body::Bytes;
 use hyper::{Request, Response};
 
 pub(crate) use resources::reload_resource_map;
+use crate::utils::AsRes;
 
 pub type Req = Request<hyper::body::Incoming>;
 pub type Res = Response<Full<Bytes>>;
@@ -19,6 +21,23 @@ const HTML_FILE_EXTENSION: &str = ".html";
 /// # Errors
 /// This function should always return a Response in an `Ok` variant!
 pub async fn service(req: Req, addr: SocketAddr) -> Result<Res, Infallible> {
+    if ws::is_upgrade(&req) {
+        let res = match ws::upgrade(req) {
+            Ok((res, web_socket)) => {
+                tokio::spawn(async move {
+                    if let Err(err) = ws::handle(web_socket, addr).await {
+                        error!("[{}] WebSocket: {}", addr, err);
+                    }
+                });
+
+                res
+            },
+            Err(err) => err.into_res(),
+        };
+
+        return Ok(res);
+    }
+
     let req_path = req.uri().path().to_owned();
     let mut path = req_path.as_str();
 
