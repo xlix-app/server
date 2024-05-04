@@ -145,6 +145,14 @@ pub enum RHSError {
     InvalidRollbackCode {
         code: u64,
     },
+
+    // --- ACCESS CODE
+    #[serde(rename = "error.accessCodeInvalidFormat")]
+    AccessCodeInvalidFormat,
+    #[serde(rename = "error.accessCodeTampered")]
+    AccessCodeTampered,
+    #[serde(rename = "error.accessCodeExpired")]
+    AccessCodeExpired,
 }
 
 impl RHSError {
