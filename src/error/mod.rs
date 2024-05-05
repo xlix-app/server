@@ -145,6 +145,10 @@ pub enum RHSError {
     InvalidRollbackCode {
         code: u64,
     },
+    #[serde(rename = "error.databaseSystemHasNoAssignedKeys")]
+    SystemHasNoAssignedKeys,
+    #[serde(rename = "error.databaseSystemAssignedKeyIsInvalid")]
+    SystemAssignedKeyIsInvalid,
 
     // --- ACCESS CODE
     #[serde(rename = "error.accessCodeInvalidFormat")]

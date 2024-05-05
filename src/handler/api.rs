@@ -1,6 +1,7 @@
 mod core;
 mod version;
 mod health;
+mod file;
 
 use std::collections::HashMap;
 use std::future::Future;
@@ -28,6 +29,7 @@ lazy_static! {
 
         map.insert("/version", version::Version.into_obj());
         map.insert("/health", health::Health.into_obj());
+        map.insert("/file", file::File.into_obj());
 
         map
     };

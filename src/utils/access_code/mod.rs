@@ -16,7 +16,7 @@ pub struct AccessCode<'a> {
 }
 
 impl<'a> AccessCode<'a> {
-    fn from_raw(raw: &'a str) -> Result<Self, RHSError> {
+    pub fn from_raw(raw: &'a str) -> Result<Self, RHSError> {
         let (payload_raw, sig_raw) = raw
             .split_once('.')
             .ok_or(RHSError::AccessCodeInvalidFormat)?;
