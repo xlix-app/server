@@ -4,7 +4,6 @@ use super::*;
 #[serde(rename_all="camelCase")]
 pub struct Payload {
     pub op: Operation,
-    pub sub_pub_key: String,
     pub sys: String,
     pub exp: u64,
 }
