@@ -36,4 +36,17 @@ impl Database {
 
         Ok(system)
     }
+
+    pub async fn create_file(&self, size: usize) -> Result<ID, RHSError> {
+        let mut response = self
+            .query(surql::FILE_CREATE)
+            .bind(("size", size))
+            .await?;
+
+        let id = response
+            .take::<Option<ID>>(0)?
+            .ok_or(RHSError::Unexpected)?;
+
+        Ok(id)
+    }
 }

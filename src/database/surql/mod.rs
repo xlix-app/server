@@ -15,4 +15,5 @@ surql! {
     update,
     system_create,
     system_get_by_name,
+    file_create,
 }
