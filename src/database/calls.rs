@@ -21,4 +21,19 @@ impl Database {
 
         Ok(system)
     }
+
+    pub async fn system_get_by_name(&self, system: impl AsRef<str>) -> Result<table_system::Object, RHSError> {
+        let mut response = self
+            .query(surql::SYSTEM_GET_BY_NAME)
+            .bind(("system_name", system.as_ref()))
+            .await?;
+
+        let system = response
+            .take::<Option<table_system::Object>>(0)?
+            .ok_or_else(|| RHSError::EntityNotFound {
+                entity: system.as_ref().into(),
+            })?;
+
+        Ok(system)
+    }
 }
