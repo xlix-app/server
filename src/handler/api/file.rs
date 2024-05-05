@@ -33,7 +33,7 @@ impl File {
         let payload = read_body_json::<FilePostPayload>(body, 10_000).await?;
         // todo: check file size
 
-        let db: Database = Database::get().unwrap();
+        let db: &'static Database = Database::get().await.unwrap();
         let system = db.system_get_by_name(&access_code.payload.sys).await?;
 
         let system_pub_key = system

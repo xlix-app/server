@@ -31,7 +31,7 @@ impl Database {
         let system = response
             .take::<Option<table_system::Object>>(0)?
             .ok_or_else(|| RHSError::EntityNotFound {
-                entity: system.as_ref().into(),
+                entity: system.as_ref().to_string().into(),
             })?;
 
         Ok(system)
