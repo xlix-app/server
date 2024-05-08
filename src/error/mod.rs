@@ -153,6 +153,8 @@ pub enum RHSError {
     // --- ACCESS CODE
     #[serde(rename = "error.accessCodeInvalidFormat")]
     AccessCodeInvalidFormat,
+    #[serde(rename = "error.accessCodeUnexpectedPayload")]
+    AccessCodeUnexpectedPayload,
     #[serde(rename = "error.accessCodeTampered")]
     AccessCodeTampered,
     #[serde(rename = "error.accessCodeExpired")]

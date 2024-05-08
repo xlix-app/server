@@ -37,9 +37,10 @@ impl Database {
         Ok(system)
     }
 
-    pub async fn create_file(&self, size: usize) -> Result<ID, RHSError> {
+    pub async fn create_file(&self, sub: impl AsRef<str>, size: u64) -> Result<ID, RHSError> {
         let mut response = self
             .query(surql::FILE_CREATE)
+            .bind(("sub", sub.as_ref()))
             .bind(("size", size))
             .await?;
 

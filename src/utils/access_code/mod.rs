@@ -38,6 +38,16 @@ impl<'a> AccessCode<'a> {
         })
     }
 
+    pub fn verify_lifetime(&self) -> Result<(), RHSError> {
+        if let Some(exp) = self.payload.get_exp() {
+            if exp < time::now() {
+                return Err(RHSError::AccessCodeExpired);
+            }
+        }
+
+        Ok(())
+    }
+
     pub fn verify(&self, sessionless: &Sessionless, pub_key: PublicKey) -> Result<(), RHSError> {
         sessionless.verify(
             self.payload_b64,
@@ -45,10 +55,6 @@ impl<'a> AccessCode<'a> {
             &self.sig
         ).map_err(|_| RHSError::AccessCodeTampered)?;
 
-        if self.payload.exp < time::now() {
-            Err(RHSError::AccessCodeExpired)
-        } else {
-            Ok(())
-        }
+        Ok(())
     }
 }

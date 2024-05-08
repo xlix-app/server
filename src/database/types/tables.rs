@@ -108,6 +108,7 @@ table! {
 table! {
     name: file,
     fields: {
+        sub: String,
         size: usize,
         packs: Vec<()>,
         state: FileState,

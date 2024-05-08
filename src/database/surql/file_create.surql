@@ -1,1 +1,1 @@
-CREATE file SET size=$size RETURN id;
+CREATE file SET sub=$sub, size=$size RETURN id;

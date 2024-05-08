@@ -3,13 +3,9 @@ use sessionless::hex::FromHex;
 use sessionless::PublicKey;
 use crate::database::Database;
 use crate::utils::access_code::AccessCode;
+use crate::utils::access_code::payload::Payload;
 use crate::utils::SESSIONLESS;
 use super::*;
-
-#[derive(Deserialize)]
-struct FilePostPayload {
-    size: usize,
-}
 
 #[derive(Serialize)]
 #[serde(rename_all="camelCase")]
@@ -29,27 +25,30 @@ impl File {
             })?;
 
         let access_code = AccessCode::from_raw(access_code_raw)?;
+        access_code.verify_lifetime()?;
 
-        let payload = read_body_json::<FilePostPayload>(body, 10_000).await?;
-        // todo: check file size
+        match &access_code.payload {
+            Payload::CreateFileRequest { sys, sub, size, .. } => {
+                // todo: check file size
+                let db: &'static Database = Database::get().await.unwrap();
+                let system = db.system_get_by_name(sys).await?;
 
-        let db: &'static Database = Database::get().await.unwrap();
-        let system = db.system_get_by_name(&access_code.payload.sys).await?;
+                let system_pub_key = system
+                    .public_key
+                    .map(|hex| PublicKey::from_hex(hex.into_bytes()))
+                    .ok_or(RHSError::SystemHasNoAssignedKeys)?
+                    .map_err(|_| RHSError::SystemAssignedKeyIsInvalid)?;
 
-        let system_pub_key = system
-            .public_key
-            .map(|hex| PublicKey::from_hex(hex.into_bytes()))
-            .ok_or(RHSError::SystemHasNoAssignedKeys)?
-            .map_err(|_| RHSError::SystemAssignedKeyIsInvalid)?;
+                access_code.verify(&*SESSIONLESS, system_pub_key)?;
 
-        access_code.verify(&*SESSIONLESS, system_pub_key)?;
+                let file_id = db.create_file(sub, *size).await?;
 
-        let file_id = db.create_file(payload.size).await?;
-        // todo: invalidate the access code
-
-        Ok(FilePostResponse {
-            file_id: file_id.into_raw(),
-        }.into_res())
+                Ok(FilePostResponse {
+                    file_id: file_id.into_raw(),
+                }.into_res())
+            },
+            _ => Err(RHSError::AccessCodeUnexpectedPayload),
+        }
     }
 }
 
