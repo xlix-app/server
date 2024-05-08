@@ -1,3 +1,5 @@
+use crate::database::types::*;
+
 macro_rules! table {
     (name: $name:ident, fields: { $( $field:ident : $typ:ty $(,)? )* }) => {
         paste::paste!{
@@ -107,6 +109,8 @@ table! {
     name: file,
     fields: {
         size: usize,
-        pack: Vec<()>,
+        packs: Vec<()>,
+        state: FileState,
+        last_update: u64,
     }
 }
