@@ -2,6 +2,8 @@ use sessionless::hex::FromHex;
 use sessionless::PublicKey;
 use crate::database::Database;
 use crate::error::RHSError::*;
+use crate::utils::access_code::AccessCode;
+use crate::utils::access_code::payload::Payload;
 use super::*;
 
 static ERR_MSG_MISSING_ACTION: &str = "Missing argument [0 - action] from: system <action>";
@@ -37,6 +39,25 @@ impl System {
             system.id.into_raw()
         ).into())
     }
+
+    async fn authenticate<'a>(ins: Instruction<'a>) -> Output {
+        let payload = {
+            let payload_raw = *ins.args.get(1).ok_or(ERR_MSG_MISSING_ACTION)?;
+            serde_json::from_str::<Payload>(payload_raw).map_err(|err|
+                format!("Invalid Payload object: [{}]", err)
+            )
+        }?;
+
+        let private_key = ins.args.get(2).map(|val| *val);
+
+        let access_code = AccessCode::new(payload, private_key)
+            .map_err(|err| format!("Couldn't create AccessCode: {}", err))?;
+
+        Ok(format!(
+            "Success! [{}]",
+            access_code
+        ).into())
+    }
 }
 
 impl CommandInfo for System {
@@ -53,6 +74,7 @@ impl Command for System {
             let action = *ins.args.get(0).ok_or(ERR_MSG_MISSING_ACTION)?;
             return match action {
                 "create" => System::create(ins).await,
+                "auth" => System::authenticate(ins).await,
                 _ => Err(ERR_MSG_INVALID_ACTION.into())
             };
         }.output_future()
