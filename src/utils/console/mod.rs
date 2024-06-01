@@ -68,11 +68,11 @@ impl Engine {
             let instruction = input.trim();
 
             match engine.execute(instruction).await {
-                Ok(Ok(_)) => {
-                    info!("Ok!");
+                Ok(Ok(output)) => {
+                    info!("[ENGINE] {}", output);
                 }
-                Ok(Err(_)) => {
-                    error!("Err!");
+                Ok(Err(err)) => {
+                    error!("[ENGINE] {}", err);
                 }
                 Err(err) => error!("[ENGINE ERROR] {}", err),
             }
