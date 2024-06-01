@@ -35,7 +35,7 @@ fn make_filter() -> String {
 
     format!(
         "{}={},{}={}",
-        env!("CARGO_PKG_NAME"), get_level(),
+        env!("CARGO_PKG_NAME").replace('-', "_"), get_level(),
         "surrealdb", "warn",
     )
 }
