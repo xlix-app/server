@@ -3,6 +3,7 @@ mod persistent;
 
 use std::io::{Error, ErrorKind};
 use std::path::Path;
+use anyhow::anyhow;
 use serde::{Deserialize, Serialize};
 use tokio::fs::{create_dir_all, OpenOptions};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
@@ -12,9 +13,11 @@ pub use persistent::*;
 trait CfgIntern: for<'a> Deserialize<'a> + Serialize + Default {
     fn path() -> &'static str;
 
-    fn fix(&mut self) {}
+    async fn fix(&mut self) -> anyhow::Result<()> {
+        Ok(())
+    }
 
-    async fn load() -> std::io::Result<Self> {
+    async fn load() -> anyhow::Result<Self> {
         let config_path = Path::new(Self::path());
 
         let mut config = if !config_path.is_file() {
@@ -32,9 +35,7 @@ trait CfgIntern: for<'a> Deserialize<'a> + Serialize + Default {
                 .await?;
 
             file.write_all(
-                serde_json::to_string_pretty(&config)
-                    .unwrap()
-                    .as_bytes()
+                serde_json::to_string_pretty(&config)?.as_bytes()
             ).await?;
 
             config
@@ -51,15 +52,12 @@ trait CfgIntern: for<'a> Deserialize<'a> + Serialize + Default {
             match serde_json::from_str::<Self>(buffer.as_str()) {
                 Ok(config) => config,
                 Err(err) => return Err(
-                    Error::new(
-                        ErrorKind::Other,
-                        format!("Invalid JSON structure for the config file [{}]: {}", Self::path(), err)
-                    )
+                   anyhow!("Invalid JSON structure for the config file [{}]: {}", Self::path(), err)
                 ),
             }
         };
 
-        config.fix();
+        config.fix().await?;
 
         Ok(config)
     }

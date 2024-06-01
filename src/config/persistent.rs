@@ -1,3 +1,5 @@
+pub mod storage;
+
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use tokio::sync::OnceCell;
 use super::*;
@@ -8,6 +10,7 @@ static CFG: OnceCell<ConfigPer> = OnceCell::const_new();
 pub struct ConfigPer {
     pub addr_server: SocketAddr,
     pub db_update_interval: u64,
+    pub storage: storage::StorageConfig,
 }
 
 impl Default for ConfigPer {
@@ -18,6 +21,7 @@ impl Default for ConfigPer {
                 80,
             ),
             db_update_interval: 10,
+            storage: Default::default(),
         }
     }
 }
@@ -27,11 +31,15 @@ impl CfgIntern for ConfigPer {
         "config/persistent.json"
     }
 
-    fn fix(&mut self) {
+    async fn fix(&mut self) -> anyhow::Result<()> {
         if self.db_update_interval < 5 {
             warn!("Config value 'db_update_interval' under the minimum value, updating to: '5'.");
             self.db_update_interval = 5;
         }
+
+        self.storage.fix().await?;
+
+        Ok(())
     }
 }
 
